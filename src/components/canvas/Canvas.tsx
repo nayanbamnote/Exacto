@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useDrop } from 'react-dnd';
+import { useDroppable } from '@dnd-kit/core';
 import { useElementStore } from '@/store/useElementStore';
 import Element from '@/components/elements/Element';
 import PositioningControls from './PositioningControls';
@@ -40,32 +40,16 @@ const Canvas: React.FC<CanvasProps> = ({
     document.documentElement.style.setProperty('--grid-size', `${gridSize}px`);
   }, [gridSize]);
 
-  // Function to snap coordinates to grid
-  const snapToGrid = (value: number) => {
-    return Math.round(value / gridSize) * gridSize;
-  };
-
-  // Setup drop functionality with react-dnd
-  const [{ isOver, canDrop }, drop] = useDrop({
-    accept: ITEM_TYPE,
-    drop: (item: any, monitor) => {
-      const delta = monitor.getDifferenceFromInitialOffset();
-      
-      if (!delta) return {};
-      
-      // Calculate new position, clamping to canvas boundaries
-      const newX = Math.max(0, Math.min(width - (showRulers ? 40 : 20), item.left + delta.x));
-      const newY = Math.max(0, Math.min(height - (showRulers ? 40 : 20), item.top + delta.y));
-      
-      return {
-        x: newX,
-        y: newY
-      };
-    },
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
-      canDrop: !!monitor.canDrop(),
-    }),
+  // Setup drop functionality with @dnd-kit/core
+  const { setNodeRef, isOver } = useDroppable({
+    id: 'canvas-droppable',
+    data: {
+      accepts: ITEM_TYPE,
+      gridSize,
+      width,
+      height,
+      showRulers
+    }
   });
 
   // Generate ruler markers
@@ -235,7 +219,7 @@ const Canvas: React.FC<CanvasProps> = ({
       <div
         ref={(node) => {
           canvasRef.current = node;
-          drop(node);
+          setNodeRef(node);
         }}
         className={`absolute bg-white ${showGrid ? 'bg-grid-pattern-enhanced' : ''} ${isOver ? 'bg-blue-50' : ''}`}
         style={{

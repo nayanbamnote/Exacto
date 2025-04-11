@@ -287,11 +287,19 @@ const Sidebar = () => {
                 </div>
                 
                 {/* Keyboard shortcuts help */}
-                <div className="mt-4 bg-gray-700 p-2 rounded text-xs text-gray-300">
-                  <p className="font-semibold mb-1">Keyboard Shortcuts:</p>
-                  <p>Arrow keys: Move element by grid size</p>
-                  <p>Shift + Arrows: Move by 10px</p>
-                  <p>Alt + Arrows: Move by 1px</p>
+                <div className="bg-gray-700 p-2 rounded mt-2">
+                  <p className="text-xs text-gray-300 font-semibold mb-2">Keyboard Shortcuts:</p>
+                  <div className="text-xs text-gray-300 space-y-1">
+                    <p className="mt-1 font-semibold border-b border-gray-600 pb-1">Movement:</p>
+                    <p>⬅️➡️⬆️⬇️: Move element</p>
+                    <p>Shift + Arrows: Move by 10px</p>
+                    
+                    <p className="mt-2 border-t border-gray-600 pt-1 font-semibold">Resizing:</p>
+                    <p>Alt + ⬅️➡️: Adjust width</p>
+                    <p>Alt + ⬆️⬇️: Adjust height</p>
+                    <p>Shift + Alt + Arrows: Resize by 10px</p>
+                    <p>R key or corner handles: Open size dialog</p>
+                  </div>
                 </div>
                 
                 {/* Delete button */}

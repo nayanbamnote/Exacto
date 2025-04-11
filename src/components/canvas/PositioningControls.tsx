@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Element, useElementStore } from '@/store/useElementStore';
 import { useHotkeys } from 'react-hotkeys-hook';
 
@@ -11,12 +11,20 @@ const PositioningControls: React.FC<PositioningControlsProps> = ({ gridSize }) =
   const { elements, selectedElementId, updateElement } = useElementStore();
   const selectedElement = elements.find(el => el.id === selectedElementId);
   const positionRef = useRef<{ x: number, y: number } | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
+
+  // Show notification for a short time
+  const showNotification = (message: string) => {
+    setNotification(message);
+    setTimeout(() => setNotification(null), 2000);
+  };
 
   // Use react-hotkeys-hook for more precise keyboard controls
+  // Movement controls
   useHotkeys('up', (e) => {
     if (!selectedElementId || document.activeElement?.tagName === 'INPUT') return;
     e.preventDefault();
-    moveSelectedElement(0, -gridSize);
+    moveSelectedElement(0, -1);
   }, { keydown: true, keyup: false });
 
   useHotkeys('shift+up', (e) => {
@@ -25,16 +33,10 @@ const PositioningControls: React.FC<PositioningControlsProps> = ({ gridSize }) =
     moveSelectedElement(0, -10);
   }, { keydown: true, keyup: false });
 
-  useHotkeys('alt+up', (e) => {
-    if (!selectedElementId || document.activeElement?.tagName === 'INPUT') return;
-    e.preventDefault();
-    moveSelectedElement(0, -1);
-  }, { keydown: true, keyup: false });
-
   useHotkeys('down', (e) => {
     if (!selectedElementId || document.activeElement?.tagName === 'INPUT') return;
     e.preventDefault();
-    moveSelectedElement(0, gridSize);
+    moveSelectedElement(0, 1);
   }, { keydown: true, keyup: false });
 
   useHotkeys('shift+down', (e) => {
@@ -43,16 +45,10 @@ const PositioningControls: React.FC<PositioningControlsProps> = ({ gridSize }) =
     moveSelectedElement(0, 10);
   }, { keydown: true, keyup: false });
 
-  useHotkeys('alt+down', (e) => {
-    if (!selectedElementId || document.activeElement?.tagName === 'INPUT') return;
-    e.preventDefault();
-    moveSelectedElement(0, 1);
-  }, { keydown: true, keyup: false });
-
   useHotkeys('left', (e) => {
     if (!selectedElementId || document.activeElement?.tagName === 'INPUT') return;
     e.preventDefault();
-    moveSelectedElement(-gridSize, 0);
+    moveSelectedElement(-1, 0);
   }, { keydown: true, keyup: false });
 
   useHotkeys('shift+left', (e) => {
@@ -61,28 +57,16 @@ const PositioningControls: React.FC<PositioningControlsProps> = ({ gridSize }) =
     moveSelectedElement(-10, 0);
   }, { keydown: true, keyup: false });
 
-  useHotkeys('alt+left', (e) => {
-    if (!selectedElementId || document.activeElement?.tagName === 'INPUT') return;
-    e.preventDefault();
-    moveSelectedElement(-1, 0);
-  }, { keydown: true, keyup: false });
-
   useHotkeys('right', (e) => {
     if (!selectedElementId || document.activeElement?.tagName === 'INPUT') return;
     e.preventDefault();
-    moveSelectedElement(gridSize, 0);
+    moveSelectedElement(1, 0);
   }, { keydown: true, keyup: false });
 
   useHotkeys('shift+right', (e) => {
     if (!selectedElementId || document.activeElement?.tagName === 'INPUT') return;
     e.preventDefault();
     moveSelectedElement(10, 0);
-  }, { keydown: true, keyup: false });
-
-  useHotkeys('alt+right', (e) => {
-    if (!selectedElementId || document.activeElement?.tagName === 'INPUT') return;
-    e.preventDefault();
-    moveSelectedElement(1, 0);
   }, { keydown: true, keyup: false });
 
   // Helper function to move elements
@@ -140,6 +124,13 @@ const PositioningControls: React.FC<PositioningControlsProps> = ({ gridSize }) =
           <div className="absolute bottom-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-80">
             Position Mode: {getPositionMode(selectedElement)}
           </div>
+          
+          {/* Notification */}
+          {notification && (
+            <div className="fixed top-4 right-4 bg-blue-600 text-white px-3 py-2 rounded shadow-lg z-50 animate-fade-in-out">
+              {notification}
+            </div>
+          )}
         </>
       )}
     </>
