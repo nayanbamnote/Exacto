@@ -32,6 +32,12 @@ const CustomElementCreator: React.FC<CustomElementCreatorProps> = ({ onClose }) 
     }
   };
   
+  // Generate random color
+  const generateRandomColor = () => {
+    const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+    setBackgroundColor(randomColor);
+  };
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -52,10 +58,6 @@ const CustomElementCreator: React.FC<CustomElementCreatorProps> = ({ onClose }) 
         borderStyle: 'solid',
         borderColor,
         borderRadius: `${borderRadius}px`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '8px',
       }
     });
     
@@ -118,6 +120,14 @@ const CustomElementCreator: React.FC<CustomElementCreatorProps> = ({ onClose }) 
                 onChange={(e) => setBackgroundColor(e.target.value)}
                 className="flex-1 ml-2 bg-gray-700 text-white rounded px-3 py-2 border border-gray-600"
               />
+              <button
+                type="button"
+                onClick={generateRandomColor}
+                className="ml-2 px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded text-sm"
+                title="Generate random color"
+              >
+                🎲
+              </button>
             </div>
           </div>
           

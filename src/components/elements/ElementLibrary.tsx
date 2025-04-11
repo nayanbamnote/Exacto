@@ -28,6 +28,7 @@ export const elementPresets = [
       color: '#ffffff',
       borderRadius: '4px',
       border: 'none',
+      // These flex properties are for editor display only and will be filtered out in CSS generation
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -55,6 +56,7 @@ export const elementPresets = [
     defaultHeight: 150,
     style: {
       backgroundColor: '#e2e8f0',
+      // These flex properties are for editor display only and will be filtered out in CSS generation
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
