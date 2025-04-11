@@ -19,6 +19,19 @@ const CustomElementCreator: React.FC<CustomElementCreatorProps> = ({ onClose }) 
   const [borderRadius, setBorderRadius] = useState(0);
   const [text, setText] = useState('');
   
+  // Handle numeric input changes with better flexibility
+  const handleNumericChange = (setter: React.Dispatch<React.SetStateAction<number>>, value: string) => {
+    if (value === '' || value === '-') {
+      // For empty input, set a temporary string value
+      setter(0);
+    } else {
+      const numValue = Number(value);
+      if (!isNaN(numValue)) {
+        setter(numValue);
+      }
+    }
+  };
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -72,20 +85,18 @@ const CustomElementCreator: React.FC<CustomElementCreatorProps> = ({ onClose }) 
             <div>
               <label className="block text-gray-300 text-sm mb-1">Width (px)</label>
               <input
-                type="number"
-                value={width}
-                onChange={(e) => setWidth(Number(e.target.value))}
-                min="1"
+                type="text"
+                value={width === 0 ? '' : width}
+                onChange={(e) => handleNumericChange(setWidth, e.target.value)}
                 className="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600"
               />
             </div>
             <div>
               <label className="block text-gray-300 text-sm mb-1">Height (px)</label>
               <input
-                type="number"
-                value={height}
-                onChange={(e) => setHeight(Number(e.target.value))}
-                min="1"
+                type="text"
+                value={height === 0 ? '' : height}
+                onChange={(e) => handleNumericChange(setHeight, e.target.value)}
                 className="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600"
               />
             </div>
@@ -115,20 +126,18 @@ const CustomElementCreator: React.FC<CustomElementCreatorProps> = ({ onClose }) 
             <div>
               <label className="block text-gray-300 text-sm mb-1">Border Width</label>
               <input
-                type="number"
-                value={borderWidth}
-                onChange={(e) => setBorderWidth(Number(e.target.value))}
-                min="0"
+                type="text"
+                value={borderWidth === 0 ? '' : borderWidth}
+                onChange={(e) => handleNumericChange(setBorderWidth, e.target.value)}
                 className="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600"
               />
             </div>
             <div>
               <label className="block text-gray-300 text-sm mb-1">Border Radius</label>
               <input
-                type="number"
-                value={borderRadius}
-                onChange={(e) => setBorderRadius(Number(e.target.value))}
-                min="0"
+                type="text"
+                value={borderRadius === 0 ? '' : borderRadius}
+                onChange={(e) => handleNumericChange(setBorderRadius, e.target.value)}
                 className="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600"
               />
             </div>

@@ -20,6 +20,21 @@ const Sidebar = () => {
     }
   };
 
+  // Handle numeric input changes with better flexibility
+  const handleNumericChange = (property: string, value: string) => {
+    if (selectedElementId) {
+      // Allow empty string or valid numbers
+      if (value === '' || value === '-') {
+        updateElement(selectedElementId, { [property]: value });
+      } else {
+        const numValue = Number(value);
+        if (!isNaN(numValue)) {
+          updateElement(selectedElementId, { [property]: numValue });
+        }
+      }
+    }
+  };
+
   // Handle position fine adjustment
   const adjustPosition = (property: 'x' | 'y', amount: number) => {
     if (selectedElementId && selectedElement) {
@@ -161,9 +176,9 @@ const Sidebar = () => {
                     </div>
                   </div>
                   <input
-                    type="number"
-                    value={selectedElement.zIndex || 1}
-                    onChange={(e) => handlePropertyChange('zIndex', parseInt(e.target.value) || 0)}
+                    type="text"
+                    value={selectedElement.zIndex ?? ''}
+                    onChange={(e) => handleNumericChange('zIndex', e.target.value)}
                     className="w-full bg-gray-600 text-white text-sm rounded px-2 py-1 border border-gray-500"
                   />
                 </div>
@@ -191,9 +206,9 @@ const Sidebar = () => {
                         </div>
                       </div>
                       <input
-                        type="number"
-                        value={selectedElement.x}
-                        onChange={(e) => handlePropertyChange('x', parseInt(e.target.value) || 0)}
+                        type="text"
+                        value={selectedElement.x ?? ''}
+                        onChange={(e) => handleNumericChange('x', e.target.value)}
                         className="w-full bg-gray-600 text-white text-sm rounded px-2 py-1 border border-gray-500"
                       />
                     </div>
@@ -216,9 +231,9 @@ const Sidebar = () => {
                         </div>
                       </div>
                       <input
-                        type="number"
-                        value={selectedElement.y}
-                        onChange={(e) => handlePropertyChange('y', parseInt(e.target.value) || 0)}
+                        type="text"
+                        value={selectedElement.y ?? ''}
+                        onChange={(e) => handleNumericChange('y', e.target.value)}
                         className="w-full bg-gray-600 text-white text-sm rounded px-2 py-1 border border-gray-500"
                       />
                     </div>
@@ -232,18 +247,18 @@ const Sidebar = () => {
                     <div className="space-y-1">
                       <span className="text-xs text-gray-300">Width</span>
                       <input
-                        type="number"
-                        value={selectedElement.width}
-                        onChange={(e) => handlePropertyChange('width', parseInt(e.target.value) || 10)}
+                        type="text"
+                        value={selectedElement.width ?? ''}
+                        onChange={(e) => handleNumericChange('width', e.target.value)}
                         className="w-full bg-gray-600 text-white text-sm rounded px-2 py-1 border border-gray-500"
                       />
                     </div>
                     <div className="space-y-1">
                       <span className="text-xs text-gray-300">Height</span>
                       <input
-                        type="number"
-                        value={selectedElement.height}
-                        onChange={(e) => handlePropertyChange('height', parseInt(e.target.value) || 10)}
+                        type="text"
+                        value={selectedElement.height ?? ''}
+                        onChange={(e) => handleNumericChange('height', e.target.value)}
                         className="w-full bg-gray-600 text-white text-sm rounded px-2 py-1 border border-gray-500"
                       />
                     </div>
@@ -258,16 +273,16 @@ const Sidebar = () => {
                       type="range"
                       min="0"
                       max="360"
-                      value={selectedElement.rotation || 0}
+                      value={selectedElement.rotation ?? 0}
                       onChange={(e) => handlePropertyChange('rotation', parseInt(e.target.value))}
                       className="flex-1"
                     />
                     <input
-                      type="number"
+                      type="text"
                       min="0"
                       max="360"
-                      value={selectedElement.rotation || 0}
-                      onChange={(e) => handlePropertyChange('rotation', parseInt(e.target.value) % 360)}
+                      value={selectedElement.rotation ?? 0}
+                      onChange={(e) => handleNumericChange('rotation', e.target.value)}
                       className="w-16 bg-gray-600 text-white text-sm rounded px-2 py-1 border border-gray-500"
                     />
                   </div>

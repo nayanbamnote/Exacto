@@ -54,12 +54,19 @@ const CanvasControls: React.FC<CanvasControlsProps> = ({
 
   // Handle custom dimension changes
   const handleDimensionChange = (dimension: 'width' | 'height', value: string) => {
+    // Allow empty input temporarily
+    if (value === '' || value === '-') {
+      // We don't update the parent component for empty strings
+      // This allows typing without forcing a number right away
+      return;
+    }
+    
     const numValue = parseInt(value);
-    if (!isNaN(numValue) && numValue > 0) {
+    if (!isNaN(numValue)) {
       if (dimension === 'width') {
-        onWidthChange(numValue);
+        onWidthChange(numValue > 0 ? numValue : 1);
       } else {
-        onHeightChange(numValue);
+        onHeightChange(numValue > 0 ? numValue : 1);
       }
     }
   };
@@ -88,19 +95,25 @@ const CanvasControls: React.FC<CanvasControlsProps> = ({
         {/* Custom Dimensions */}
         <div className="flex items-center space-x-2">
           <input
-            type="number"
+            type="text"
             className="w-16 bg-white border border-gray-300 text-gray-700 py-1 px-2 rounded text-sm"
             value={canvasWidth}
             onChange={(e) => handleDimensionChange('width', e.target.value)}
-            min="1"
+            onBlur={() => {
+              // Ensure we have valid values on blur
+              if (canvasWidth <= 0) onWidthChange(1);
+            }}
           />
           <span className="text-gray-500 text-sm">×</span>
           <input
-            type="number"
+            type="text"
             className="w-16 bg-white border border-gray-300 text-gray-700 py-1 px-2 rounded text-sm"
             value={canvasHeight}
             onChange={(e) => handleDimensionChange('height', e.target.value)}
-            min="1"
+            onBlur={() => {
+              // Ensure we have valid values on blur
+              if (canvasHeight <= 0) onHeightChange(1);
+            }}
           />
         </div>
         
