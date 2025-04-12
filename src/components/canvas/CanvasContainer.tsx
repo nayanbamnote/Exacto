@@ -8,8 +8,8 @@ const CanvasContainer: React.FC = () => {
   const [canvasWidth, setCanvasWidth] = useState(1200);
   const [canvasHeight, setCanvasHeight] = useState(800);
   const [gridSize, setGridSize] = useState(20);
-  const [showGrid, setShowGrid] = useState(true);
-  const [showRulers, setShowRulers] = useState(true);
+  const [showGrid, setShowGrid] = useState(false);
+  const [showRulers, setShowRulers] = useState(false);
   const [zoom, setZoom] = useState(1); // 1 = 100%
 
   // Handle preset selection

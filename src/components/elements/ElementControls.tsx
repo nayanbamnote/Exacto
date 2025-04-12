@@ -66,28 +66,27 @@ const ElementControls: React.FC<ElementControlsProps> = ({
         className="absolute w-px h-6 bg-green-500 left-1/2 -top-6 -translate-x-1/2 z-9"
       />
       
-      {/* Information labels - repositioned to avoid overlap */}
-      <div className="absolute -top-24 left-0 flex flex-col gap-1 items-start">
-        {/* Element size and rotation info */}
-        <div className="text-xs bg-blue-500 text-white px-1 rounded">
-          {getPositionDisplay()}
+      {/* Information panel - positioned at the bottom of the element instead */}
+      <div className="absolute left-0 -bottom-1 transform translate-y-full mt-1 bg-gray-900 text-white rounded shadow-md z-50 text-xs">
+        <div className="flex items-center px-2 py-1">
+          <span>Size: {element.width}×{element.height}</span>
+          {getPositionMode() === 'absolute' && (
+            <>
+              <span className="mx-1 text-gray-400">|</span>
+              <span>X: {element.x.toFixed(2)}, Y: {element.y.toFixed(2)}</span>
+            </>
+          )}
+          <span className="mx-1 text-gray-400">|</span>
+          <span>Rot: {Math.round(element.rotation || 0)}°</span>
         </div>
         
-        {/* Parent indicator */}
-        {element.parentId && (
-          <div className="text-xs bg-purple-500 text-white px-1 rounded">
-            Child of {element.parentId.split('-').pop()}
-          </div>
-        )}
-        
-        {/* Z-index indicator */}
-        <div className="text-xs bg-gray-700 text-white px-1 rounded">
-          z-index: {element.zIndex || 1}
-        </div>
-        
-        {/* Position mode indicator */}
-        <div className="text-xs bg-gray-600 text-white px-1 rounded">
-          {getPositionMode()}
+        {/* Tags in a separate line */}
+        <div className="flex items-center gap-1 px-1 py-1 bg-black bg-opacity-30">
+          <span className="px-1 bg-blue-600 rounded">{getPositionMode()}</span>
+          {element.parentId && (
+            <span className="px-1 bg-purple-600 rounded">child</span>
+          )}
+          <span className="px-1 bg-gray-600 rounded">z:{element.zIndex || 1}</span>
         </div>
       </div>
     </>

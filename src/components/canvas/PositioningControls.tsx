@@ -92,11 +92,22 @@ const PositioningControls: React.FC<PositioningControlsProps> = ({ gridSize }) =
     return getPositionMode(element) === 'absolute';
   };
 
+  // Get appropriate position details based on position mode
+  const getPositionDetails = (element: Element) => {
+    const positionMode = getPositionMode(element);
+    if (positionMode === 'absolute') {
+      return `X: ${element.x.toFixed(2)}, Y: ${element.y.toFixed(2)}`;
+    } else {
+      // For relative positioning, show offset with a more concise format
+      return `Position: relative (X: ${element.x.toFixed(2)}, Y: ${element.y.toFixed(2)})`;
+    }
+  };
+
   return (
     <>
       {selectedElement && (
         <>
-          {/* Position indicators - only show for absolute positioning */}
+          {/* Position indicators */}
           <div className="absolute pointer-events-none" 
             style={{ 
               left: `${selectedElement.x}px`, 
@@ -105,10 +116,8 @@ const PositioningControls: React.FC<PositioningControlsProps> = ({ gridSize }) =
               height: `${selectedElement.height}px`,
               zIndex: 9999 
             }}>
-            <div className="absolute -top-6 left-0 bg-blue-600 text-white text-xs px-1 rounded">
-              {shouldShowCoordinates(selectedElement) 
-                ? `X: ${selectedElement.x}, Y: ${selectedElement.y}` 
-                : `Position: ${getPositionMode(selectedElement)}`}
+            <div className="absolute left-0 -top-2 transform -translate-y-full bg-blue-600 text-white text-xs px-2 py-1 rounded-md shadow-md">
+              {getPositionDetails(selectedElement)}
             </div>
             
             {/* Helper lines - only show for absolute positioning */}
@@ -120,9 +129,9 @@ const PositioningControls: React.FC<PositioningControlsProps> = ({ gridSize }) =
             )}
           </div>
           
-          {/* Position mode indicator */}
-          <div className="absolute bottom-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-80">
-            Position Mode: {getPositionMode(selectedElement)}
+          {/* Position mode indicator - moved to ensure it's always visible */}
+          <div className="fixed bottom-4 right-4 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-90 shadow-md z-[9999]">
+            Position Mode: {getPositionMode(selectedElement)} | Size: {selectedElement.width}×{selectedElement.height}
           </div>
           
           {/* Notification */}

@@ -158,7 +158,7 @@ const Element: React.FC<ElementProps> = ({ element, gridSize }) => {
     if (positionMode === 'absolute') {
       return `${element.width} × ${element.height} | ${Math.round(element.rotation || 0)}°`;
     } else {
-      return `${element.width} × ${element.height} | ${Math.round(element.rotation || 0)}° (relative)`;
+      return `${element.width} × ${element.height} | ${Math.round(element.rotation || 0)}°`;
     }
   };
 

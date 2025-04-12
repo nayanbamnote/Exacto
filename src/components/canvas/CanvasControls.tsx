@@ -16,12 +16,15 @@ interface CanvasControlsProps {
   onPresetSelect: (preset: { width: number; height: number; name: string }) => void;
 }
 
-// Preset device sizes
+// Default device presets
 const DEVICE_PRESETS = [
-  { name: 'Desktop (1920×1080)', width: 1920, height: 1080 },
-  { name: 'Laptop (1366×768)', width: 1366, height: 768 },
-  { name: 'Tablet (768×1024)', width: 768, height: 1024 },
-  { name: 'Mobile (375×667)', width: 375, height: 667 },
+  { width: 1200, height: 800, name: 'Desktop' },
+  { width: 768, height: 1024, name: 'Tablet Portrait' },
+  { width: 1024, height: 768, name: 'Tablet Landscape' },
+  { width: 375, height: 667, name: 'Mobile Portrait' },
+  { width: 667, height: 375, name: 'Mobile Landscape' },
+  { width: 1920, height: 1080, name: 'HD' },
+  { width: 1280, height: 720, name: 'HD Small' },
 ];
 
 const CanvasControls: React.FC<CanvasControlsProps> = ({
@@ -39,35 +42,31 @@ const CanvasControls: React.FC<CanvasControlsProps> = ({
   onZoomChange,
   onPresetSelect,
 }) => {
-  // Handle device preset selection
-  const handlePresetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedIndex = parseInt(e.target.value);
-    if (selectedIndex >= 0) {
-      onPresetSelect(DEVICE_PRESETS[selectedIndex]);
-    }
-  };
-
-  // Handle zoom level changes
-  const handleZoomChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onZoomChange(parseInt(e.target.value) / 100);
-  };
-
-  // Handle custom dimension changes
+  // Handle dimension changes
   const handleDimensionChange = (dimension: 'width' | 'height', value: string) => {
-    // Allow empty input temporarily
-    if (value === '' || value === '-') {
-      // We don't update the parent component for empty strings
-      // This allows typing without forcing a number right away
-      return;
-    }
-    
     const numValue = parseInt(value);
-    if (!isNaN(numValue)) {
+    if (!isNaN(numValue) && numValue > 0) {
       if (dimension === 'width') {
-        onWidthChange(numValue > 0 ? numValue : 1);
+        onWidthChange(numValue);
       } else {
-        onHeightChange(numValue > 0 ? numValue : 1);
+        onHeightChange(numValue);
       }
+    }
+  };
+
+  // Handle preset selection
+  const handlePresetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const index = parseInt(e.target.value);
+    if (index >= 0 && index < DEVICE_PRESETS.length) {
+      onPresetSelect(DEVICE_PRESETS[index]);
+    }
+  };
+
+  // Handle zoom change
+  const handleZoomChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const zoomPercent = parseInt(e.target.value);
+    if (!isNaN(zoomPercent) && zoomPercent > 0) {
+      onZoomChange(zoomPercent / 100);
     }
   };
 
@@ -115,41 +114,6 @@ const CanvasControls: React.FC<CanvasControlsProps> = ({
               if (canvasHeight <= 0) onHeightChange(1);
             }}
           />
-        </div>
-        
-        {/* Grid and Rulers Toggles */}
-        <div className="flex items-center bg-white border border-gray-300 rounded">
-          <button
-            className={`py-1 px-3 text-sm ${
-              showGrid ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'
-            }`}
-            onClick={() => onShowGridChange(!showGrid)}
-          >
-            Grid
-          </button>
-          <button
-            className={`py-1 px-3 text-sm border-l border-gray-300 ${
-              showRulers ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'
-            }`}
-            onClick={() => onShowRulersChange(!showRulers)}
-          >
-            Rulers
-          </button>
-        </div>
-        
-        {/* Grid Size Control */}
-        <div className="flex items-center">
-          <label className="text-sm text-gray-500 mr-1">Grid:</label>
-          <select
-            className="bg-white border border-gray-300 text-gray-700 py-1 px-2 rounded text-sm"
-            value={gridSize}
-            onChange={(e) => onGridSizeChange(parseInt(e.target.value))}
-          >
-            <option value="5">5px</option>
-            <option value="10">10px</option>
-            <option value="20">20px</option>
-            <option value="50">50px</option>
-          </select>
         </div>
       </div>
       

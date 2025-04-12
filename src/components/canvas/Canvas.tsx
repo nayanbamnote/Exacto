@@ -19,8 +19,8 @@ const Canvas: React.FC<CanvasProps> = ({
   width = 1200,
   height = 800,
   gridSize = 20,
-  showGrid = true,
-  showRulers = true,
+  showGrid = false,
+  showRulers = false,
 }) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const { elements, addElement, updateElement, setSelectedElementId, selectedElementId } = useElementStore();
@@ -47,174 +47,63 @@ const Canvas: React.FC<CanvasProps> = ({
       accepts: ITEM_TYPE,
       gridSize,
       width,
-      height,
-      showRulers
+      height
     }
   });
 
-  // Generate ruler markers
-  const generateMarkers = (size: number, isHorizontal: boolean) => {
-    const markers = [];
-    const count = isHorizontal ? Math.ceil(width / gridSize) : Math.ceil(height / gridSize);
+  // Mouse event handlers for element selection and moving
+  const handleMouseDown = (e: React.MouseEvent) => {
+    // Only handle left mouse button
+    if (e.button !== 0) return;
     
-    for (let i = 0; i <= count; i++) {
-      const position = i * gridSize;
-      const isLarge = i % 5 === 0;
+    // If clicking on the canvas background (not an element)
+    if (e.currentTarget === e.target) {
+      // Clear selected element
+      setSelectedElementId(null);
       
-      markers.push(
-        <div
-          key={i}
-          className={`absolute bg-gray-400 ${isLarge ? 'bg-gray-600' : ''}`}
-          style={{
-            ...(isHorizontal
-              ? {
-                  left: `${position}px`,
-                  top: isLarge ? '0px' : '15px',
-                  width: '1px',
-                  height: isLarge ? '20px' : '5px',
-                }
-              : {
-                  top: `${position}px`,
-                  left: isLarge ? '0px' : '15px',
-                  height: '1px',
-                  width: isLarge ? '20px' : '5px',
-                }),
-          }}
-        />
-      );
-      
-      // Add labels for large markers
-      if (isLarge) {
-        markers.push(
-          <div
-            key={`text-${i}`}
-            className="absolute text-xs text-gray-600"
-            style={{
-              ...(isHorizontal
-                ? {
-                    left: `${position - 7}px`,
-                    top: '22px',
-                  }
-                : {
-                    top: `${position - 7}px`,
-                    left: '22px',
-                  }),
-            }}
-          >
-            {position}
-          </div>
-        );
+      // Start selection box
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (rect) {
+        const startX = e.clientX - rect.left;
+        const startY = e.clientY - rect.top;
+        
+        setSelectionBox({
+          startX,
+          startY,
+          width: 0,
+          height: 0,
+          active: true
+        });
+        
+        // Setup mouse move and mouse up event listeners
+        const handleMouseMove = (moveEvent: MouseEvent) => {
+          if (selectionBox && selectionBox.active && rect) {
+            const currentX = moveEvent.clientX - rect.left;
+            const currentY = moveEvent.clientY - rect.top;
+            
+            setSelectionBox({
+              ...selectionBox,
+              width: currentX - selectionBox.startX,
+              height: currentY - selectionBox.startY,
+            });
+          }
+        };
+        
+        const handleMouseUp = () => {
+          setSelectionBox(prev => prev ? { ...prev, active: false } : null);
+          
+          document.removeEventListener('mousemove', handleMouseMove);
+          document.removeEventListener('mouseup', handleMouseUp);
+        };
+        
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
       }
     }
-    
-    return markers;
   };
-  
-  // Handle mouse events for selection
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.target !== canvasRef.current) return;
-    
-    // Clear selection on canvas click
-    setSelectedElementId(null);
-    
-    // Start selection box if the user is pressing shift or ctrl
-    if (e.shiftKey || e.ctrlKey) {
-      const rect = canvasRef.current!.getBoundingClientRect();
-      const startX = e.clientX - rect.left;
-      const startY = e.clientY - rect.top;
-      
-      setSelectionBox({
-        startX,
-        startY,
-        width: 0,
-        height: 0,
-        active: true
-      });
-      
-      // Add event listeners for selection box
-      document.addEventListener('mousemove', handleSelectionMove);
-      document.addEventListener('mouseup', handleSelectionEnd);
-    }
-  };
-  
-  // Handle selection box movement
-  const handleSelectionMove = (e: MouseEvent) => {
-    if (!selectionBox || !selectionBox.active || !canvasRef.current) return;
-    
-    const rect = canvasRef.current.getBoundingClientRect();
-    const currentX = e.clientX - rect.left;
-    const currentY = e.clientY - rect.top;
-    
-    setSelectionBox({
-      ...selectionBox,
-      width: currentX - selectionBox.startX,
-      height: currentY - selectionBox.startY
-    });
-  };
-  
-  // Handle selection box end
-  const handleSelectionEnd = () => {
-    if (!selectionBox || !selectionBox.active) return;
-    
-    // Calculate the selection box coordinates
-    const left = selectionBox.width >= 0 ? selectionBox.startX : selectionBox.startX + selectionBox.width;
-    const top = selectionBox.height >= 0 ? selectionBox.startY : selectionBox.startY + selectionBox.height;
-    const right = selectionBox.width >= 0 ? selectionBox.startX + selectionBox.width : selectionBox.startX;
-    const bottom = selectionBox.height >= 0 ? selectionBox.startY + selectionBox.height : selectionBox.startY;
-    
-    // Find elements that fall within the selection box
-    const selectedElements = elements.filter((element) => {
-      // Check if element is within selection box
-      return (
-        element.x < right &&
-        element.x + element.width > left &&
-        element.y < bottom &&
-        element.y + element.height > top
-      );
-    });
-    
-    // Select the first element (or allow multi-select in the future)
-    if (selectedElements.length > 0) {
-      setSelectedElementId(selectedElements[0].id);
-    }
-    
-    // Remove event listeners
-    document.removeEventListener('mousemove', handleSelectionMove);
-    document.removeEventListener('mouseup', handleSelectionEnd);
-    
-    // Clear selection box
-    setSelectionBox(null);
-  };
-  
-  // Clean up event listeners on component unmount
-  useEffect(() => {
-    return () => {
-      document.removeEventListener('mousemove', handleSelectionMove);
-      document.removeEventListener('mouseup', handleSelectionEnd);
-    };
-  }, []);
 
   return (
     <div className="relative" style={{ width: `${width}px`, height: `${height}px` }}>
-      {/* Horizontal ruler */}
-      {showRulers && (
-        <div className="absolute left-[20px] top-0 h-[20px] bg-gray-100 border-b border-r border-gray-300" style={{ width: `${width}px` }}>
-          {generateMarkers(gridSize, true)}
-        </div>
-      )}
-      
-      {/* Vertical ruler */}
-      {showRulers && (
-        <div className="absolute left-0 top-[20px] w-[20px] bg-gray-100 border-r border-gray-300" style={{ height: `${height}px` }}>
-          {generateMarkers(gridSize, false)}
-        </div>
-      )}
-      
-      {/* Ruler corner */}
-      {showRulers && (
-        <div className="absolute left-0 top-0 w-[20px] h-[20px] bg-gray-200 border-r border-b border-gray-300"></div>
-      )}
-      
       {/* Main canvas area */}
       <div
         ref={(node) => {
@@ -223,10 +112,10 @@ const Canvas: React.FC<CanvasProps> = ({
         }}
         className={`absolute bg-white ${showGrid ? 'bg-grid-pattern-enhanced' : ''} ${isOver ? 'bg-blue-50' : ''}`}
         style={{
-          left: showRulers ? '20px' : '0',
-          top: showRulers ? '20px' : '0',
-          width: showRulers ? `${width - 20}px` : `${width}px`,
-          height: showRulers ? `${height - 20}px` : `${height}px`,
+          left: 0,
+          top: 0,
+          width: `${width}px`,
+          height: `${height}px`,
         }}
         onMouseDown={handleMouseDown}
       >
